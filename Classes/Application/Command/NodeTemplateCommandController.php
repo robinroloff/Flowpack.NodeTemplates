@@ -110,7 +110,9 @@ class NodeTemplateCommandController extends CommandController
                 $templateConfiguration,
                 [
                     'data' => $observableEmptyData,
-                    'triggeringNode' => $siteNode,
+                    'triggeringNode' => $siteNode, // @deprecated
+                    'site' => $siteNode,
+                    'parentNode' => $siteNode,
                 ],
                 $processingErrors
             );
