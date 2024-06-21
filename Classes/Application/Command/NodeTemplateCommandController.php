@@ -138,6 +138,9 @@ class NodeTemplateCommandController extends CommandController
 
         $this->outputLine();
 
+        // sort so the result is deterministic in ci https://github.com/neos/flow-development-collection/issues/3300
+        ksort($faultyNodeTypeTemplates);
+
         $hasError = false;
         foreach ($faultyNodeTypeTemplates as $nodeTypeName => ['processingErrors' => $processingErrors, 'dataWasAccessed' => $dataWasAccessed]) {
             if ($dataWasAccessed) {

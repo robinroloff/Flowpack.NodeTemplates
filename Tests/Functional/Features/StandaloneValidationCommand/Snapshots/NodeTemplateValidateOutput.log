@@ -1,4 +1,4 @@
-9 of 14 NodeType template validated. 5 could not be build standalone.
+10 of 15 NodeType template validated. 5 could not be build standalone.
 
 Flowpack.NodeTemplates:Content.DisallowedChildNodes
   NodeConstraintException(Node type "Flowpack.NodeTemplates:Content.Text" is not allowed below tethered child nodes "content" of nodes of type "Flowpack.NodeTemplates:Content.DisallowedChildNodes", 1687541480146)
@@ -7,6 +7,15 @@ Flowpack.NodeTemplates:Content.DisallowedChildNodes
 
 Flowpack.NodeTemplates:Content.OnlyExceptions
   Expression "${'left open" in "childNodes.abort.when" | EelException(The EEL expression "${'left open" was not a valid EEL expression. Perhaps you forgot to wrap it in ${...}?, 1410441849)
+
+Flowpack.NodeTemplates:Content.ResolvableProperties <b>(depends on "data" context)</b>
+  Property "asset" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | PropertyIgnoredException(Object of type Neos\Media\Domain\Model\Asset with identity "c228200e-7472-4290-9936-4454a5b5692a" not found., 1686779371122)
+
+  Property "images" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | PropertyIgnoredException(Object of type Neos\Media\Domain\Model\ImageInterface with identity "c8ae9f9f-dd11-4373-bf42-4bf31ec5bd19" not found., 1686779371122)
+
+  Reference "reference" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | InvalidReferenceException(Node with identifier "some-node-id" does not exist., 1687632330292)
+
+  Reference "references" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | InvalidReferenceException(Invalid reference value. Value `["some-node-id","other-node-id",null]` is not a valid list of nodes or node identifiers., 1685958176560)
 
 Flowpack.NodeTemplates:Content.SomeExceptions
   Expression "${cannotCallThis()}" in "properties.foo" | NotAllowedException(Method "cannotCallThis" is not callable in untrusted context, 1369043080)
@@ -56,15 +65,6 @@ Flowpack.NodeTemplates:Content.SomeExceptions
   RuntimeException(Template requires type to be a valid NodeType. Got: "Flowpack.NodeTemplates:InvalidNodeType"., 1685999795564)
 
   RuntimeException(Template cant mutate type of auto created child nodes. Got: "Flowpack.NodeTemplates:Content.SomeExceptions", 1685999829307)
-
-Flowpack.NodeTemplates:Content.ResolvableProperties <b>(depends on "data" context)</b>
-  Property "asset" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | PropertyIgnoredException(Object of type Neos\Media\Domain\Model\Asset with identity "c228200e-7472-4290-9936-4454a5b5692a" not found., 1686779371122)
-
-  Property "images" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | PropertyIgnoredException(Object of type Neos\Media\Domain\Model\ImageInterface with identity "c8ae9f9f-dd11-4373-bf42-4bf31ec5bd19" not found., 1686779371122)
-
-  Reference "reference" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | InvalidReferenceException(Node with identifier "some-node-id" does not exist., 1687632330292)
-
-  Reference "references" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | InvalidReferenceException(Invalid reference value. Value `["some-node-id","other-node-id",null]` is not a valid list of nodes or node identifiers., 1685958176560)
 
 Flowpack.NodeTemplates:Content.UnresolvableProperties
   Property "someString" in NodeType "Flowpack.NodeTemplates:Content.UnresolvableProperties" | PropertyIgnoredException(Because value `["foo"]` is not assignable to property type "string"., 1685958105644)
