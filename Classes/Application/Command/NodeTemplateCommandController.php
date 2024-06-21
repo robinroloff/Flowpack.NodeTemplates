@@ -13,6 +13,7 @@ use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Neos\Flow\Annotations as Flow;
 use Neos\Flow\Cli\CommandController;
+use Neos\Neos\Domain\Service\ContentContext;
 
 class NodeTemplateCommandController extends CommandController
 {
@@ -90,6 +91,7 @@ class NodeTemplateCommandController extends CommandController
             }
             $processingErrors = ProcessingErrors::create();
 
+            /** @var ContentContext $subgraph */
             $subgraph = $this->contextFactory->create();
 
             $observableEmptyData = new class ([]) extends \ArrayObject
@@ -102,11 +104,13 @@ class NodeTemplateCommandController extends CommandController
                 }
             };
 
+            $siteNode = $subgraph->getCurrentSiteNode();
+
             $template = $this->templateConfigurationProcessor->processTemplateConfiguration(
                 $templateConfiguration,
                 [
                     'data' => $observableEmptyData,
-                    'triggeringNode' => $subgraph->getRootNode(),
+                    'triggeringNode' => $siteNode,
                 ],
                 $processingErrors
             );
