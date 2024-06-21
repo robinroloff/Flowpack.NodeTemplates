@@ -159,17 +159,22 @@ because it inspires a more declarative mood. The naming is inspired by Ansible.
 
 There are several variables available in the EEL context for example.
 
-| Variable name                | Type                   | Description                                                 | Availability            |
-|------------------------------|------------------------|-------------------------------------------------------------|-------------------------|
-| data                         | `array<string, mixed>` | Data from the node creation dialog                          | Global                  |
-| site                         | `Node`                 | The site node where the node creation was triggered         | Global                  |
-| triggeringNode _@deprecated_ | `Node`                 | The main node whose creation triggered template processing  | Global                  |
-| parentSourceNode             | `Node`                 | The parent of the node the template is initially applied on | Global                  |
-| item                         | `mixed`                | The current item value inside a loop                        | Inside `withItems` loop |
-| key                          | `string`               | The current item key inside a loop                          | Inside `withItems` loop |
+| Variable name    | Type                   | Description                                                                   | Availability            |
+|------------------|------------------------|-------------------------------------------------------------------------------|-------------------------|
+| data             | `array<string, mixed>` | Data from the node creation dialog                                            | Global                  |
+| site             | `Node`                 | The site node in which the new node be created in                             | Global                  |
+| parentNode       | `Node`                 | The node where the new utmost node will be created inside                     | Global                  |
+| ~triggeringNode~ | `Node`                 | _Deprecated:_ The new node itself which is triggering the template processing | Global                  |
+| item             | `mixed`                | The current item value inside a loop                                          | Inside `withItems` loop |
+| key              | `string`               | The current item key inside a loop                                            | Inside `withItems` loop |
 
 > **Notice**
-> `triggeringNode` will be removed with Version 3
+> `triggeringNode` will be removed with version 3.0
+
+> **Warning**
+> The behaviour of `parentNode` changed from version 1.x to version 2.2
+> Previously it referenced the parent node of the current template part and its nesting.
+> With version 2.0 it was removed and 2.2 reintroduced the variable identifying the parent node of the first/utmost node that will be created.
 
 ### Additional context
 

@@ -9,6 +9,7 @@ use Flowpack\NodeTemplates\Domain\TemplateConfiguration\TemplateConfigurationPro
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Neos\Flow\Annotations as Flow;
+use Neos\Neos\Domain\Service\ContentContext;
 use Neos\Neos\Ui\NodeCreationHandler\NodeCreationHandlerInterface;
 
 class TemplateNodeCreationHandler implements NodeCreationHandlerInterface
@@ -49,12 +50,15 @@ class TemplateNodeCreationHandler implements NodeCreationHandlerInterface
             return;
         }
 
+        /** @var ContentContext $contentContext */
+        $contentContext = $node->getContext();
+
         $evaluationContext = [
             'data' => $data,
-            // deprecated will be removed in 3.0
+            // triggeringNode is deprecated and will be removed in 3.0
             'triggeringNode' => $node,
-            'site' => $node->getContext()->getCurrentSiteNode(),
-            'parentSourceNode' => $node->getParent(),
+            'site' => $contentContext->getCurrentSiteNode(),
+            'parentNode' => $node->getParent(),
         ];
 
         $templateConfiguration = $node->getNodeType()->getConfiguration('options.template');
