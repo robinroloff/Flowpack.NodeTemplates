@@ -14,15 +14,12 @@ use Neos\ContentRepository\Domain\Repository\WorkspaceRepository;
 use Neos\ContentRepository\Domain\Service\Context;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
-use Neos\Flow\Configuration\ConfigurationManager;
 use Neos\Flow\Tests\FunctionalTestCase;
 use Neos\Neos\Domain\Model\Site;
 use Neos\Neos\Domain\Repository\SiteRepository;
 use Neos\Neos\Ui\Domain\Model\ChangeCollection;
 use Neos\Neos\Ui\Domain\Model\FeedbackCollection;
 use Neos\Neos\Ui\TypeConverter\ChangeCollectionConverter;
-use Neos\Utility\Arrays;
-use Symfony\Component\Yaml\Yaml;
 
 abstract class AbstractNodeTemplateTestCase extends FunctionalTestCase
 {
@@ -30,6 +27,7 @@ abstract class AbstractNodeTemplateTestCase extends FunctionalTestCase
     use FeedbackCollectionMessagesTrait;
     use JsonSerializeNodeTreeTrait;
     use WithConfigurationTrait;
+    use FakeNodeTypeManagerTrait;
 
     protected static $testablePersistenceEnabled = true;
 
@@ -72,27 +70,6 @@ abstract class AbstractNodeTemplateTestCase extends FunctionalTestCase
 
         $ref = new \ReflectionClass($this);
         $this->fixturesDir = dirname($ref->getFileName()) . '/Snapshots';
-    }
-
-    private function loadFakeNodeTypes(): void
-    {
-        $configuration = $this->objectManager->get(ConfigurationManager::class)->getConfiguration('NodeTypes');
-
-        $fileIterator = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(__DIR__ . '/Features'));
-
-        /** @var \SplFileInfo $fileInfo */
-        foreach ($fileIterator as $fileInfo) {
-            if (!$fileInfo->isFile() || $fileInfo->getExtension() !== 'yaml' || strpos($fileInfo->getBasename(), 'NodeTypes.') !== 0) {
-                continue;
-            }
-
-            $configuration = Arrays::arrayMergeRecursiveOverrule(
-                $configuration,
-                Yaml::parseFile($fileInfo->getRealPath()) ?? []
-            );
-        }
-
-        $this->nodeTypeManager->overrideNodeTypes($configuration);
     }
 
     public function tearDown(): void
