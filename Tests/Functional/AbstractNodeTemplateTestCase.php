@@ -11,7 +11,6 @@ use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Model\Workspace;
 use Neos\ContentRepository\Domain\Repository\ContentDimensionRepository;
 use Neos\ContentRepository\Domain\Repository\WorkspaceRepository;
-use Neos\ContentRepository\Domain\Service\Context;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Neos\Flow\Tests\FunctionalTestCase;
@@ -43,9 +42,10 @@ abstract class AbstractNodeTemplateTestCase extends FunctionalTestCase
 
     private NodeTypeManager $nodeTypeManager;
 
-    private Context $subgraph;
-
     private string $fixturesDir;
+
+    /** @deprecated please use {@see self::getObject()} instead */
+    protected $objectManager;
 
     public function setUp(): void
     {
@@ -82,6 +82,17 @@ abstract class AbstractNodeTemplateTestCase extends FunctionalTestCase
         $this->objectManager->forgetInstance(NodeTypeManager::class);
     }
 
+    /**
+     * @template T of object
+     * @param class-string<T> $className
+     *
+     * @return T
+     */
+    final protected function getObject(string $className): object
+    {
+        return $this->objectManager->get($className);
+    }
+
     private function setupContentRepository(): void
     {
         // Create an environment to create nodes.
@@ -98,10 +109,9 @@ abstract class AbstractNodeTemplateTestCase extends FunctionalTestCase
 
         $this->persistenceManager->persistAll();
         $this->contextFactory = $this->objectManager->get(ContextFactoryInterface::class);
-        $this->subgraph = $this->contextFactory->create(['workspaceName' => 'live']);
+        $subgraph = $this->contextFactory->create(['workspaceName' => 'live']);
 
-        $rootNode = $this->subgraph->getRootNode();
-
+        $rootNode = $subgraph->getRootNode();
 
         $sitesRootNode = $rootNode->createNode('sites');
         $testSiteNode = $sitesRootNode->createNode('test-site');

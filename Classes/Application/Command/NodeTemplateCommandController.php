@@ -51,8 +51,8 @@ class NodeTemplateCommandController extends CommandController
      * Dump the node tree structure into a NodeTemplate YAML structure.
      * References to Nodes and non-primitive property values are commented out in the YAML.
      *
-     * @param string $startingNodeId specified root node of the node tree
-     * @param string $workspaceName
+     * @param string $startingNodeId specified root node of the node tree.
+     * @param string $workspaceName custom workspace to dump from. Defaults to 'live'.
      * @return void
      */
     public function createFromNodeSubtreeCommand(string $startingNodeId, string $workspaceName = 'live'): void
