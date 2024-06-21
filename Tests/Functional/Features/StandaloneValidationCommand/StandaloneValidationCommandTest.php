@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace Flowpack\NodeTemplates\Tests\Functional\Features\StandaloneValidationCommand;
 
 use Flowpack\NodeTemplates\Application\Command\NodeTemplateCommandController;
-use Flowpack\NodeTemplates\Domain\NodeTemplateDumper\NodeTemplateDumper;
-use Flowpack\NodeTemplates\Domain\Template\RootTemplate;
 use Flowpack\NodeTemplates\Tests\Functional\FakeNodeTypeManagerTrait;
 use Flowpack\NodeTemplates\Tests\Functional\SnapshotTrait;
-use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Model\Workspace;
 use Neos\ContentRepository\Domain\Repository\ContentDimensionRepository;
 use Neos\ContentRepository\Domain\Repository\WorkspaceRepository;
@@ -33,14 +30,6 @@ final class StandaloneValidationCommandTest extends FunctionalTestCase
 
     private ContextFactoryInterface $contextFactory;
 
-    protected NodeInterface $homePageNode;
-
-    protected NodeInterface $homePageMainContentCollectionNode;
-
-    private NodeTemplateDumper $nodeTemplateDumper;
-
-    private RootTemplate $lastCreatedRootTemplate;
-
     private NodeTypeManager $nodeTypeManager;
 
     private string $fixturesDir;
@@ -49,7 +38,7 @@ final class StandaloneValidationCommandTest extends FunctionalTestCase
     {
         parent::setUp();
 
-        $this->nodeTypeManager = $this->objectManager->get(NodeTypeManager::class);
+        $this->nodeTypeManager = $this->getObject(NodeTypeManager::class);
 
         $this->loadFakeNodeTypes();
 
@@ -63,34 +52,45 @@ final class StandaloneValidationCommandTest extends FunctionalTestCase
     {
         parent::tearDown();
         $this->inject($this->contextFactory, 'contextInstances', []);
-        $this->objectManager->get(FeedbackCollection::class)->reset();
+        $this->getObject(FeedbackCollection::class)->reset();
         $this->objectManager->forgetInstance(ContentDimensionRepository::class);
         $this->objectManager->forgetInstance(NodeTypeManager::class);
+    }
+
+    /**
+     * @template T of object
+     * @param class-string<T> $className
+     *
+     * @return T
+     */
+    final protected function getObject(string $className): object
+    {
+        return $this->objectManager->get($className);
     }
 
     private function setupContentRepository(): void
     {
         // Create an environment to create nodes.
-        $this->objectManager->get(ContentDimensionRepository::class)->setDimensionsConfiguration([]);
+        $this->getObject(ContentDimensionRepository::class)->setDimensionsConfiguration([]);
 
         $liveWorkspace = new Workspace('live');
-        $workspaceRepository = $this->objectManager->get(WorkspaceRepository::class);
+        $workspaceRepository = $this->getObject(WorkspaceRepository::class);
         $workspaceRepository->add($liveWorkspace);
 
         $testSite = new Site('test-site');
         $testSite->setSiteResourcesPackageKey('Test.Site');
-        $siteRepository = $this->objectManager->get(SiteRepository::class);
+        $siteRepository = $this->getObject(SiteRepository::class);
         $siteRepository->add($testSite);
 
         $this->persistenceManager->persistAll();
-        $this->contextFactory = $this->objectManager->get(ContextFactoryInterface::class);
+        $this->contextFactory = $this->getObject(ContextFactoryInterface::class);
         $subgraph = $this->contextFactory->create(['workspaceName' => 'live']);
 
         $rootNode = $subgraph->getRootNode();
 
         $sitesRootNode = $rootNode->createNode('sites');
         $testSiteNode = $sitesRootNode->createNode('test-site');
-        $this->homePageNode = $testSiteNode->createNode(
+        $testSiteNode->createNode(
             'homepage',
             $this->nodeTypeManager->getNodeType('Flowpack.NodeTemplates:Document.HomePage')
         );
@@ -99,7 +99,7 @@ final class StandaloneValidationCommandTest extends FunctionalTestCase
     /** @test */
     public function itMatchesSnapshot()
     {
-        $commandController = $this->objectManager->get(NodeTemplateCommandController::class);
+        $commandController = $this->getObject(NodeTemplateCommandController::class);
 
         ObjectAccess::setProperty($commandController, 'response', $cliResponse = new Response(), true);
         ObjectAccess::getProperty($commandController, 'output', true)->setOutput($bufferedOutput = new BufferedOutput());
