@@ -60,6 +60,8 @@ Flowpack.NodeTemplates:Content.SomeExceptions
 Flowpack.NodeTemplates:Content.ResolvableProperties <b>(depends on "data" context)</b>
   Property "asset" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | PropertyIgnoredException(Object of type Neos\Media\Domain\Model\Asset with identity "c228200e-7472-4290-9936-4454a5b5692a" not found., 1686779371122)
 
+  Property "images" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | PropertyIgnoredException(Object of type Neos\Media\Domain\Model\ImageInterface with identity "c8ae9f9f-dd11-4373-bf42-4bf31ec5bd19" not found., 1686779371122)
+
   Reference "reference" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | InvalidReferenceException(Node with identifier "some-node-id" does not exist., 1687632330292)
 
   Reference "references" in NodeType "Flowpack.NodeTemplates:Content.ResolvableProperties" | InvalidReferenceException(Invalid reference value. Value `["some-node-id","other-node-id",null]` is not a valid list of nodes or node identifiers., 1685958176560)
