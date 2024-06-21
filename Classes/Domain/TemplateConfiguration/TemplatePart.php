@@ -30,7 +30,7 @@ class TemplatePart
 
     /**
      * @psalm-readonly
-     * @psalm-var \Closure(mixed $value, array<string, mixed> $evaluationContext): mixed
+     * @var \Closure(mixed $value, array<string, mixed> $evaluationContext): mixed
      */
     private \Closure $configurationValueProcessor;
 
@@ -40,9 +40,9 @@ class TemplatePart
     private ProcessingErrors $processingErrors;
 
     /**
-     * @psalm-param array<string, mixed> $configuration
-     * @psalm-param array<string, mixed> $evaluationContext
-     * @psalm-param \Closure(mixed $value, array<string, mixed> $evaluationContext): mixed $configurationValueProcessor
+     * @param array<string, mixed> $configuration
+     * @param array<string, mixed> $evaluationContext
+     * @param \Closure(mixed $value, array<string, mixed> $evaluationContext): mixed $configurationValueProcessor
      * @throws StopBuildingTemplatePartException
      */
     private function __construct(
@@ -61,9 +61,9 @@ class TemplatePart
     }
 
     /**
-     * @psalm-param array<string, mixed> $configuration
-     * @psalm-param array<string, mixed> $evaluationContext
-     * @psalm-param \Closure(mixed $value, array<string, mixed> $evaluationContext): mixed $configurationValueProcessor
+     * @param array<string, mixed> $configuration
+     * @param array<string, mixed> $evaluationContext
+     * @param \Closure(mixed $value, array<string, mixed> $evaluationContext): mixed $configurationValueProcessor
      * @throws StopBuildingTemplatePartException
      */
     public static function createRoot(
@@ -102,7 +102,7 @@ class TemplatePart
     }
 
     /**
-     * @psalm-param string|list<string> $configurationPath
+     * @param string|list<string> $configurationPath
      * @throws StopBuildingTemplatePartException
      */
     public function withConfigurationByConfigurationPath($configurationPath): self
@@ -117,7 +117,7 @@ class TemplatePart
     }
 
     /**
-     * @psalm-param array<string, mixed> $evaluationContext
+     * @param array<string, mixed> $evaluationContext
      */
     public function withMergedEvaluationContext(array $evaluationContext): self
     {
@@ -134,7 +134,7 @@ class TemplatePart
     }
 
     /**
-     * @psalm-param string|list<string> $configurationPath
+     * @param string|list<string> $configurationPath
      * @return mixed
      * @throws StopBuildingTemplatePartException
      */
@@ -185,7 +185,7 @@ class TemplatePart
     }
 
     /**
-     * @psalm-param string|list<string> $configurationPath
+     * @param string|list<string> $configurationPath
      */
     public function hasConfiguration($configurationPath): bool
     {
