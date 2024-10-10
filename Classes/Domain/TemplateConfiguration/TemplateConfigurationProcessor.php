@@ -2,6 +2,7 @@
 
 namespace Flowpack\NodeTemplates\Domain\TemplateConfiguration;
 
+use Exception;
 use Flowpack\NodeTemplates\Domain\ErrorHandling\ProcessingErrors;
 use Flowpack\NodeTemplates\Domain\Template\RootTemplate;
 use Flowpack\NodeTemplates\Domain\Template\Template;
@@ -10,17 +11,74 @@ use Neos\ContentRepository\Domain\NodeAggregate\NodeName;
 use Neos\ContentRepository\Domain\NodeType\NodeTypeName;
 use Neos\ContentRepository\Utility;
 use Neos\Flow\Annotations as Flow;
+use Neos\Flow\ResourceManagement\ResourceManager;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * @Flow\Scope("singleton")
  */
-class TemplateConfigurationProcessor
-{
+class TemplateConfigurationProcessor {
     /**
      * @Flow\Inject
      * @var EelEvaluationService
      */
     protected $eelEvaluationService;
+    /**
+     * @Flow\Inject
+     */
+    protected ResourceManager $resourceManager;
+
+    /**
+     * @param string $resourcePath
+     * @return array<string, mixed>
+     */
+    protected function getYamlFileAsObject(string $resourcePath) {
+        $filePath = FLOW_PATH_ROOT . 'DistributionPackages/' . $resourcePath;
+        if (!file_exists($filePath)) {
+            throw new Exception("Datei nicht gefunden: " . $filePath);
+        }
+
+        $yamlContent = file_get_contents($filePath);
+        if ($yamlContent === false) {
+            throw new Exception("Fehler beim Lesen der Datei: " . $filePath);
+        }
+
+        if (!class_exists('Symfony\\Component\\Yaml\\Yaml')) {
+            throw new Exception("Die Symfony Yaml-Komponente ist nicht vorhanden. Bitte installieren Sie sie mit 'composer require symfony/yaml'.");
+        }
+
+        $parsedYaml = Yaml::parse($yamlContent);
+        if ($parsedYaml === false) {
+            throw new Exception("Fehler beim Parsen der YAML-Datei: " . $filePath);
+        }
+        return $parsedYaml;
+
+    }
+
+    /**
+     * @param array<string, mixed> $configuration
+     * @return array<string, mixed>
+     * @throws Exception
+     */
+    protected function replaceReferences(array $configuration) {
+        $newArray = [];
+        foreach ($configuration as $key => $value) {
+            if (is_array($value)) {
+                $newArray[$key] = $this->replaceReferences($value);
+            } elseif (str_starts_with($value, 'reference://')) {
+                $value = str_replace('reference://', '', $value);
+                $resolvedYaml = $this->getYamlFileAsObject($value);
+                if (is_array($resolvedYaml)) {
+                    $resolvedYaml = $this->replaceReferences($resolvedYaml);
+
+                    $newArray[$key] = $resolvedYaml;
+                }
+            } else {
+                $newArray[$key] = $value;
+            }
+        }
+        return $newArray;
+    }
 
     /**
      * @param array<string, mixed> $configuration
@@ -28,13 +86,13 @@ class TemplateConfigurationProcessor
      * @param ProcessingErrors $caughtEvaluationExceptions
      * @return RootTemplate
      */
-    public function processTemplateConfiguration(array $configuration, array $evaluationContext, ProcessingErrors $caughtEvaluationExceptions): RootTemplate
-    {
+    public function processTemplateConfiguration(array $configuration, array $evaluationContext, ProcessingErrors $caughtEvaluationExceptions): RootTemplate {
+        $configuration = $this->replaceReferences($configuration);
         try {
             $templatePart = TemplatePart::createRoot(
                 $configuration,
                 $evaluationContext,
-                fn ($value, $evaluationContext) => $this->preprocessConfigurationValue($value, $evaluationContext),
+                fn($value, $evaluationContext) => $this->preprocessConfigurationValue($value, $evaluationContext),
                 $caughtEvaluationExceptions
             );
         } catch (StopBuildingTemplatePartException $e) {
@@ -43,8 +101,7 @@ class TemplateConfigurationProcessor
         return $this->createTemplatesFromTemplatePart($templatePart)->toRootTemplate();
     }
 
-    private function createTemplatesFromTemplatePart(TemplatePart $templatePart): Templates
-    {
+    private function createTemplatesFromTemplatePart(TemplatePart $templatePart): Templates {
         try {
             $withContext = [];
             foreach ($templatePart->getRawConfiguration('withContext') ?? [] as $key => $_) {
@@ -94,8 +151,7 @@ class TemplateConfigurationProcessor
         }
     }
 
-    private function createTemplateFromTemplatePart(TemplatePart $templatePart): Template
-    {
+    private function createTemplateFromTemplatePart(TemplatePart $templatePart): Template {
         // process the properties
         $processedProperties = [];
         foreach ($templatePart->getRawConfiguration('properties') ?? [] as $propertyName => $value) {
@@ -150,8 +206,7 @@ class TemplateConfigurationProcessor
      * @return mixed
      * @throws \Neos\Eel\ParserException|\Exception
      */
-    private function preprocessConfigurationValue($rawConfigurationValue, array $evaluationContext)
-    {
+    private function preprocessConfigurationValue($rawConfigurationValue, array $evaluationContext) {
         if (!is_string($rawConfigurationValue)) {
             return $rawConfigurationValue;
         }
