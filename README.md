@@ -1,4 +1,4 @@
-# Neos Node Templates
+# Neos Node test Templates
 
 When using Neos CMS as an editor, you often work with nested node structures that
 have to be created manually. This packages aims at easing the editing workflow by
